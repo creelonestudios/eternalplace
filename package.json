@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/creelonestudios/eternalplace/issues"
   },
-  "homepage": "https://github.com/creelonestudios/eternalplace#readme"
+  "homepage": "https://github.com/creelonestudios/eternalplace#readme",
+  "dependencies": {
+    "express": "^4.17.3"
+  }
 }
