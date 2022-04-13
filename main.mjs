@@ -7,11 +7,7 @@ const app = express();
 let httpsServer;
 if(config.usehttps) httpsServer = https.createServer(config.https, app);
 
-app.use(express.static("public")); // only for static files that dont change
-
-// app.get("/", (req, res) => {
-// 	res.send("Hello world!");
-// })
+app.use(express.static("htdocs")); // only for static files that dont change
 
 if(config.usehttps) {
 	// TODO: Add http redirect here
