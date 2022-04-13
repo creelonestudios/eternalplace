@@ -43,16 +43,22 @@ app.post("/api/*", (req, res) => {
     try {
       data = JSON.parse(data)
     } catch(err) {}
-    console.log("data:", data)
+    console.log(req.url, "data:", data)
     res.setHeader("Content-Type", "application/json")
 
 		let resdata = {status: {code: "unknown_error"}}
 		if(req.url == "/api/test") {
-			console.log("/api/test", data.username, data.x, data.y, data.color)
 			resdata.status.code = "success"
+		} else if(req.url == "/api/place") {
+			resdata.status.code = "success"
+			resdata.data = {}
+			resdata.data.width = 5
+			resdata.data.height = 5
+			resdata.data.pixels = ["ffffff","ff0000","ffffff","ffffff","ffffff","ffffff","00ff","ffffff","ffffff","ffffff","ffffff","ffffff","ffffff","ffffff","ffffff","ffffff","ffffff","ffffff","ffffff","ffff00","ffffff","ffffff","ffffff","6f0f0f","123456"] // for testing
 		} else {
 			resdata.status.code = "unknown_node"
 		}
+		console.log(resdata)
 		res.end(JSON.stringify(resdata))
   })
 })
