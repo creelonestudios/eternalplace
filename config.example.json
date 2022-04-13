@@ -1,0 +1,17 @@
+{
+	"usehttps": true,
+	"ports": {
+		"https": 443,
+		"http": 80
+	},
+	"https": {
+		"key": "./cert/privkey.pem",
+	  "cert": "./cert/fullchain.pem"
+	},
+	"sql": {
+	  "host": "localhost",
+	  "user": "root",
+	  "password": "password",
+	  "database": "eternalplace"
+	}
+}
