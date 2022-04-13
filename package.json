@@ -19,6 +19,7 @@
   "homepage": "https://github.com/creelonestudios/eternalplace#readme",
   "dependencies": {
     "express": "^4.17.3",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "mysql-promise": "^5.0.0"
   }
 }
