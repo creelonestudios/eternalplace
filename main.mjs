@@ -2,13 +2,6 @@ import fs from "fs"
 import https from "https"
 import express from "express";
 
-// CONFIG
-const PORT = 8080;
-const HTTPSPORT = 8443;
-const USEHTTPS = true; // highly recommended
-const CERTPATH = "";
-const KEYPATH = "";
-
 const app = express();
 let httpsServer;
 if(USEHTTPS) httpsServer = https.createServer({cert: CERTPATH,key: KEYPATH}, app);
