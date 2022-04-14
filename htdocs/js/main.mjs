@@ -55,7 +55,7 @@ canvas.addEventListener("mousemove", e => {
 })
 canvas.addEventListener("click", e => {
 	const arri = (Math.ceil(mouse.y / 40) * width - width) +
-								Math.ceil(mouse.x / 40) - 1
+								Math.ceil(mouse.x / 40) - 1 // i have no idea why i have to subtract 1 here and subtract width above. But it works so whatever
 	if(pixels[arri] == "ffffff") pixels[arri] = "000000"
 	else pixels[arri] = "ffffff"
 	requestAnimationFrame(draw)
