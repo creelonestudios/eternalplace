@@ -26,7 +26,7 @@ API.place().then(o => {
 })
 
 function draw() {
-	console.log("draw!", width, height)
+	// console.log("draw!", width, height)
 	canvas.width = canvas.clientWidth
 	canvas.height = canvas.clientHeight
 	let ctx = canvas.getContext("2d")
@@ -51,5 +51,12 @@ window.addEventListener("resize", () => requestAnimationFrame(draw))
 canvas.addEventListener("mousemove", e => {
 	mouse.x = e.offsetX
 	mouse.y = e.offsetY
+	requestAnimationFrame(draw)
+})
+canvas.addEventListener("click", e => {
+	const arri = (Math.ceil(mouse.y / 40) * width - width) +
+								Math.ceil(mouse.x / 40) - 1
+	if(pixels[arri] == "ffffff") pixels[arri] = "000000"
+	else pixels[arri] = "ffffff"
 	requestAnimationFrame(draw)
 })
