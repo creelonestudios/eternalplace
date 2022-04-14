@@ -18,4 +18,12 @@ export default class API {
     .catch(console.error)
 	}
 
+  static draw(x, y, color) {
+    return fetch("/api/draw", {
+      method: "POST",
+      body: JSON.stringify({x, y, color})
+    }).then(res => res.json())
+    .catch(console.error);
+  }
+
 }
