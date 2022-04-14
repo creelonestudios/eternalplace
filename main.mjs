@@ -78,6 +78,7 @@ app.post("/api/*", (req, res) => {
 		} else if(req.url == "/api/draw") {
 			resdata.status.code = "success"
 			canvas.setPixel(data.x, data.y, data.color)
+			sql.query("INSERT INTO history (id, x, y, date, color) VALUES (0, ?, ?, NOW(), ?)", [data.x, data.y, data.color])
 			sql.query("SELECT color FROM canvas WHERE x=? AND y=?", [data.x, data.y]).spread((current) => {
 				if(current.length == 0) sql.query("INSERT INTO canvas (x, y, color) VALUES (?, ?, ?)", [data.x, data.y, data.color])
 				else sql.query("UPDATE canvas SET color=? WHERE x=? AND y=?", [data.color, data.x, data.y])
