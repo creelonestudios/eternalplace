@@ -45,6 +45,19 @@ function draw() {
 	ctx.beginPath()
 	ctx.rect(x-0.5, y-0.5, 40 +1, 40 +1)
 	ctx.stroke()
+	drawColorPicker(ctx);
+}
+
+const COLORS = ["#00ccc0", "#e4abff", "#009eaa", "#5eb3ff", "#6a5cff", "#004b6f", "#de0a7f", "#6d001a", "#333434", "#fff8b8", "#313ac1", "#00cc4e", "#6d302f", "#b44ac0", "#ff2651", "#ffb446", "#9c451a", "#d4d7d9", "#7eed38", "#598d5a", "#00a344", "#245aea", "#ff63aa", "#ffa800", "#511e9f", "#33e9f4", "#be0027", "#ffd623", "#1832a4", "#ff2d00", "#ffffff", "#000000"];
+
+function drawColorPicker(ctx) {
+	const PICKER_HEIGHT = 70;
+	ctx.fillStyle = "#ffffff";
+	ctx.fillRect(0, canvas.height-PICKER_HEIGHT, canvas.width, PICKER_HEIGHT);
+	for(let i = 0; i < COLORS.length; i++) {
+		ctx.fillStyle = COLORS[i];
+		ctx.fillRect(i*(canvas.width/COLORS.length), canvas.height-PICKER_HEIGHT, (canvas.width/COLORS.length)-1, PICKER_HEIGHT);
+	}
 }
 
 window.addEventListener("resize", () => requestAnimationFrame(draw))
