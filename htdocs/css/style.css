@@ -25,3 +25,12 @@ html, body {
 .color {
 	width: 100%;
 }
+
+input.color {
+	margin-left: 5px;
+	border-style: none;
+	border-width: 0px;
+	height: 100%;
+	background-color: #ffff;
+	padding: 0;
+}

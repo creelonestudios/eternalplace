@@ -73,17 +73,14 @@ function populateColorPicker() {
 		})
 		picker.appendChild(div)
 	}
+	let div = document.createElement("input")
+	div.className = "color"
+	div.type = "color"
+	div.addEventListener("change", () => {
+		selectedColor = div.value.substr(1)
+	})
+	picker.appendChild(div)
 }
-
-// function drawColorPicker(ctx) {
-// 	const PICKER_HEIGHT = 70;
-// 	ctx.fillStyle = "#ffffff";
-// 	ctx.fillRect(0, canvas.height-PICKER_HEIGHT, canvas.width, PICKER_HEIGHT);
-// 	for(let i = 0; i < COLORS.length; i++) {
-// 		ctx.fillStyle = COLORS[i];
-// 		ctx.fillRect(i*(canvas.width/COLORS.length), canvas.height-PICKER_HEIGHT, (canvas.width/COLORS.length)-1, PICKER_HEIGHT);
-// 	}
-// }
 
 window.addEventListener("resize", () => requestAnimationFrame(draw))
 canvas.addEventListener("mousemove", e => {
