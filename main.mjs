@@ -30,6 +30,14 @@ if(config.usehttps) {
 	});
 }
 
+function loadPixels() {
+	sql.query("SELECT * FROM canvas").spread(rows => {
+		rows.forEach(row => {
+			canvas.setPixel(row.x, row.y, row.color)
+		})
+	})
+}
+
 function createTables() {
 	sql.query("CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(20) NOT NULL, creation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, lastdraw DATETIME)") // users table
 	sql.query("CREATE TABLE IF NOT EXISTS history (id INT NOT NULL, x SMALLINT NOT NULL, y SMALLINT NOT NULL, date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, color CHAR(6) NOT NULL DEFAULT \"ffffff\")") // canvas history table
@@ -37,6 +45,7 @@ function createTables() {
 }
 
 createTables();
+loadPixels();
 
 app.post("/api/*", (req, res) => {
 	console.log(`[${req.ip}] API Request: ${req.url}`)
@@ -64,9 +73,10 @@ app.post("/api/*", (req, res) => {
 		} else if(req.url == "/api/draw") {
 			resdata.status.code = "success"
 			canvas.setPixel(data.x, data.y, data.color)
-			const current = await sql.query("SELECT color FROM canvas WHERE x=? AND y=?", [data.x, data.y])
-			if(current.length == 0) sql.query("INSERT INTO canvas (x, y, color) VALUES (?, ?, ?)", [data.x, data.y, data.color])
-			else sql.query("UPDATE canvas SET color=? WHERE x=? AND y=?", [data.color, data.x, data.y])
+			sql.query("SELECT color FROM canvas WHERE x=? AND y=?", [data.x, data.y]).spread((current) => {
+				if(current.length == 0) sql.query("INSERT INTO canvas (x, y, color) VALUES (?, ?, ?)", [data.x, data.y, data.color])
+				else sql.query("UPDATE canvas SET color=? WHERE x=? AND y=?", [data.color, data.x, data.y])
+			})
 		} else {
 			resdata.status.code = "unknown_node"
 		}
