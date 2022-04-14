@@ -36,8 +36,8 @@ function draw() {
 	canvas.width = canvas.clientWidth
 	canvas.height = canvas.clientHeight
 	let pixelsize = 40*zoom
-	let offX = (offsetX-width)  * pixelsize + canvas.width /2
-	let offY = (offsetY-height) * pixelsize + canvas.height/2
+	let offX = Math.floor((offsetX-width)  * pixelsize + canvas.width /2)
+	let offY = Math.floor((offsetY-height) * pixelsize + canvas.height/2)
 	let ctx = canvas.getContext("2d")
 	ctx.fillStyle = "#404040"
 	ctx.fillRect(0, 0, canvas.width, canvas.height)
