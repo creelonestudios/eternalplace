@@ -38,8 +38,8 @@ export default class Canvas {
 
 	pixelArray() {
 		let arr = []
-		for(let x = 0; x < this.#width; x++) {
-			for(let y = 0; y < this.#height; y++) {
+		for(let y = 0; y < this.#height; y++) {
+			for(let x = 0; x < this.#width; x++) {
 				arr.push(this.getPixel(x, y))
 			}
 		}

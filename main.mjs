@@ -42,7 +42,7 @@ app.post("/api/*", (req, res) => {
 	console.log(`[${req.ip}] API Request: ${req.url}`)
 	let data = []
   req.on("data", chunk => data.push(chunk)) // construct body
-  req.on("end", () => {
+  req.on("end", async () => {
     data = Buffer.concat(data).toString()
     try {
       data = JSON.parse(data)
@@ -61,6 +61,12 @@ app.post("/api/*", (req, res) => {
 			console.log("hi")
 			resdata.data.pixels = canvas.pixelArray()
 			console.log(resdata.data.pixels)
+		} else if(req.url == "/api/draw") {
+			resdata.status.code = "success"
+			canvas.setPixel(data.x, data.y, data.color)
+			const current = await sql.query("SELECT color FROM canvas WHERE x=? AND y=?", [data.x, data.y])
+			if(current.length == 0) sql.query("INSERT INTO canvas (x, y, color) VALUES (?, ?, ?)", [data.x, data.y, data.color])
+			else sql.query("UPDATE canvas SET color=? WHERE x=? AND y=?", [data.color, data.x, data.y])
 		} else {
 			resdata.status.code = "unknown_node"
 		}

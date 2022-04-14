@@ -88,6 +88,12 @@ canvas.addEventListener("click", e => {
 	if(x >= width || y >= height) return
 	let i = y * width + x
 	pixels[i] = selectedColor
+	API.draw(x, y, selectedColor).then(o => {
+		if(o.status.code != "success") {
+			console.log(o.status)
+			return
+		}
+	});
 	requestAnimationFrame(draw)
 })
 
