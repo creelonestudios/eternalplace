@@ -12,13 +12,9 @@ const canvas = new Canvas(20, 20)
 const app = express();
 let io;
 let server;
-if(config.usehttps) {
-	server = https.createServer(config.https, app);
-	io = new Server(httpsServer);
-} else {
-	server = http.createServer(app);
-	io = new Server(server);
-}
+if(config.usehttps) server = https.createServer(config.https, app);
+else server = http.createServer(app);
+io = new Server(server);
 
 const sql = sqllib.default()
 sql.configure(config.sql)
