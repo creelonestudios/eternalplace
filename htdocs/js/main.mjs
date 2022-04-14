@@ -90,3 +90,7 @@ canvas.addEventListener("click", e => {
 	pixels[i] = selectedColor
 	requestAnimationFrame(draw)
 })
+
+canvas.addEventListener("contextmenu", e => {
+	e.preventDefault()
+})
