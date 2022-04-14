@@ -97,8 +97,24 @@ canvas.addEventListener("mousemove", e => {
 	mouse.y = e.offsetY
 	requestAnimationFrame(draw)
 })
-canvas.addEventListener("click", e => {
-	if(mouse.drag) return
+canvas.addEventListener("mousewheel", e => {
+	if(e.deltaY > 0 && zoom > Math.max(20 / Math.min(width, height), 0.1)) zoom *= 0.5
+	else if(e.deltaY < 0 && zoom < 4) zoom *= 2
+	else return
+	console.log(zoom)
+	requestAnimationFrame(draw)
+}, { passive: true})
+window.addEventListener("mousedown", e => {
+	mouse.pressed = true
+	mouse.pressTime = Date.now()
+})
+window.addEventListener("mouseup", e => {
+	mouse.pressed = false
+	console.log(mouse.drag)
+	if(mouse.drag) {
+		mouse.drag = false
+		return
+	}
 	let {x, y} = getMousePixel(e.offsetX, e.offsetY, false)
 	console.log(x, y)
 	if(x < 0 || y < 0 || x >= width || y >= height) return
@@ -113,21 +129,8 @@ canvas.addEventListener("click", e => {
 	sock.emit("draw", {x, y, color: selectedColor});
 	requestAnimationFrame(draw)
 })
-canvas.addEventListener("mousewheel", e => {
-	if(e.deltaY > 0) zoom *= 0.5
-	else if(e.deltaY < 0) zoom *= 2
-	else return
-	console.log(zoom)
-	requestAnimationFrame(draw)
-}, { passive: true})
-window.addEventListener("mousedown", e => {
-	mouse.pressed = true
-	mouse.pressTime = Date.now()
-})
-window.addEventListener("mouseup", e => {
-	mouse.pressed = false
-	mouse.drag    = false
-})
+
+window.m = mouse
 
 function getMousePixel(x, y, scale = true) {
 	x = x || mouse.x
