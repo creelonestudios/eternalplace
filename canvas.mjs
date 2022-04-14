@@ -1,10 +1,13 @@
+import canvaslib from "canvas"
+
 export default class Canvas {
 
-	#pixels; #width; #height
+	#pixels; #width; #height; #canvas
 	constructor(width, height) {
 		this.#pixels = new Map()
 		this.#width  = width
 		this.#height = height
+		this.#canvas = canvaslib.createCanvas(width, height)
 	}
 
 	get width() {
@@ -34,6 +37,9 @@ export default class Canvas {
 	setPixel(x, y, color) {
 		if(x < 0 || y < 0 || x >= this.#width || y >= this.#height) return
 		this.#pixels.set(`${x};${y}`, color)
+		let ctx = this.#canvas.getContext("2d")
+		ctx.fillStyle = "#" + color
+		ctx.fillRect(x, y, 1, 1)
 	}
 
 	pixelArray() {
@@ -44,6 +50,10 @@ export default class Canvas {
 			}
 		}
 		return arr
+	}
+
+	image() {
+		return this.#canvas.toBuffer()
 	}
 
 }

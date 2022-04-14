@@ -131,6 +131,11 @@ app.get("/reddit", (req, res) => {
 	})
 });
 
+app.get("/place.png", (req, res) => {
+	res.setHeader("Content-Type", "image/png")
+	res.end(canvas.image())
+})
+
 async function getRedditsPaged(token, after) {
 	const subs = await fetch("https://oauth.reddit.com/subreddits/mine/subscriber/?after=" + after, {
 		headers: {
@@ -161,7 +166,7 @@ async function getReddits(token) {
 
 app.get("/redditsubs", async (req, res) => {
 	if(!req.query.token) return res.send("No token");
-	
+
 	let subs = await getReddits(req.query.token);
 	res.send(subs);
 })
