@@ -3,6 +3,9 @@ import https from "https"
 import express from "express";
 import * as sqllib from "mysql-promise"
 import config from "./config-loader.mjs"
+import Canvas from "./canvas.mjs"
+
+const canvas = new Canvas(20, 20)
 
 const app = express();
 let httpsServer;
@@ -29,7 +32,8 @@ if(config.usehttps) {
 
 function createTables() {
 	sql.query("CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(20) NOT NULL, creation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, lastdraw DATETIME)") // users table
-	sql.query("CREATE TABLE IF NOT EXISTS canvas (id INT NOT NULL, x SMALLINT NOT NULL, y SMALLINT NOT NULL, date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, color CHAR(6) NOT NULL DEFAULT \"ffffff\")") // canvas table
+	sql.query("CREATE TABLE IF NOT EXISTS history (id INT NOT NULL, x SMALLINT NOT NULL, y SMALLINT NOT NULL, date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, color CHAR(6) NOT NULL DEFAULT \"ffffff\")") // canvas history table
+	sql.query("CREATE TABLE IF NOT EXISTS canvas (x SMALLINT NOT NULL, y SMALLINT NOT NULL, color CHAR(6) NOT NULL DEFAULT \"ffffff\")") // canvas current state table
 }
 
 createTables();
@@ -52,9 +56,11 @@ app.post("/api/*", (req, res) => {
 		} else if(req.url == "/api/place") {
 			resdata.status.code = "success"
 			resdata.data = {}
-			resdata.data.width = 5
-			resdata.data.height = 5
-			resdata.data.pixels = ["ffffff","ff0000","ffffff","ffffff","ffffff","ffffff","00ff","ffffff","ffffff","ffffff","ffffff","ffffff","ffffff","ffffff","ffffff","ffffff","ffffff","ffffff","ffffff","ffff00","ffffff","ffffff","ffffff","6f0f0f","123456"] // for testing
+			resdata.data.width = canvas.width
+			resdata.data.height = canvas.height
+			console.log("hi")
+			resdata.data.pixels = canvas.pixelArray()
+			console.log(resdata.data.pixels)
 		} else {
 			resdata.status.code = "unknown_node"
 		}

@@ -26,7 +26,7 @@ API.place().then(o => {
 })
 
 function draw() {
-	console.log("draw!")
+	console.log("draw!", width, height)
 	canvas.width = canvas.clientWidth
 	canvas.height = canvas.clientHeight
 	let ctx = canvas.getContext("2d")
