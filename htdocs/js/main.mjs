@@ -30,7 +30,7 @@ function draw() {
 	canvas.width = canvas.clientWidth
 	canvas.height = canvas.clientHeight
 	let ctx = canvas.getContext("2d")
-	ctx.fillStyle = "#000000"
+	ctx.fillStyle = "#404040"
 	ctx.fillRect(0, 0, canvas.width, canvas.height)
 	for(let x = 0; x < width; x++) {
 		for(let y = 0; y < height; y++) {
@@ -67,9 +67,11 @@ canvas.addEventListener("mousemove", e => {
 	requestAnimationFrame(draw)
 })
 canvas.addEventListener("click", e => {
-	const arri = (Math.ceil(mouse.y / 40) * width - width) +
-								Math.ceil(mouse.x / 40) - 1 // i have no idea why i have to subtract 1 here and subtract width above. But it works so whatever
-	if(pixels[arri] == "ffffff") pixels[arri] = "000000"
-	else pixels[arri] = "ffffff"
+	let x = Math.floor(e.offsetX /40)
+	let y = Math.floor(e.offsetY /40)
+	if(x >= width || y >= height) return
+	let i = y * width + x
+	if(pixels[i] == "ffffff") pixels[i] = "000000"
+	else pixels[i] = "ffffff"
 	requestAnimationFrame(draw)
 })
