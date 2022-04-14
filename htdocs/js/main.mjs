@@ -101,7 +101,7 @@ canvas.addEventListener("click", e => {
 	if(mouse.drag) return
 	let {x, y} = getMousePixel(e.offsetX, e.offsetY, false)
 	console.log(x, y)
-	if(x >= width || y >= height) return
+	if(x < 0 || x > 0 || x >= width || y >= height) return
 	let i = y * width + x
 	pixels[i] = selectedColor
 	API.draw(x, y, selectedColor).then(o => {
