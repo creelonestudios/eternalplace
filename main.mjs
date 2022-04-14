@@ -7,6 +7,7 @@ import config from "./config-loader.mjs"
 import Canvas from "./canvas.mjs"
 import { Server } from "socket.io";
 import fetch from "node-fetch"
+import cookieParser from "cookie-parser";
 
 const canvas = new Canvas(20, 20)
 
@@ -20,6 +21,7 @@ io = new Server(server);
 const sql = sqllib.default()
 sql.configure(config.sql)
 
+app.use(cookieParser());
 app.use(express.static("htdocs")); // only for static files that dont change
 
 if(config.usehttps) {
@@ -92,12 +94,23 @@ app.post("/api/*", (req, res) => {
   })
 })
 
+function randomState() {
+	let state = "";
+	for(let i = 0; i < 32; i++) {
+		state += String.fromCharCode(Math.floor(Math.random() * 26) + 97);
+	}
+	return state;
+}
+
 app.get("/auth", (req, res) => { // ! make the random string actually random
-	res.redirect(`https://www.reddit.com/api/v1/authorize?client_id=${config.reddit.client_id}&response_type=code&state=RANDOM_STRING&redirect_uri=${config.reddit.redirect_uri}&duration=temporary&scope=mysubreddits`);
+	const state = randomState();
+	res.cookie("state", state);
+	res.redirect(`https://www.reddit.com/api/v1/authorize?client_id=${config.reddit.client_id}&response_type=code&state=${state}&redirect_uri=${config.reddit.redirect_uri}&duration=temporary&scope=mysubreddits`);
 })
 
 app.get("/reddit", (req, res) => {
-	if(req.query.state !== "RANDOM_STRING") return res.send("Invalid state");
+	if(!req.cookies.state) return res.redirect("/auth");
+	if(req.query.state !== req.cookies.state) return res.send("Invalid state");
 	if(!req.query.code) return res.send("No code");
 	// res.send(req.query.code);
 	fetch("https://www.reddit.com/api/v1/access_token", {
@@ -113,6 +126,7 @@ app.get("/reddit", (req, res) => {
 		if(token.token_type !== "bearer") return res.send("Invalid token type");
 		if(!token.access_token) return res.send("No access token");
 		// res.send(res.access_token);
+		res.clearCookie("state");
 		res.redirect("/reddittest?token=" + token.access_token);
 	})
 });
@@ -145,7 +159,7 @@ async function getReddits(token) {
 	return subs;
 }
 
-app.get("/reddittest", async (req, res) => {
+app.get("/redditsubs", async (req, res) => {
 	if(!req.query.token) return res.send("No token");
 	
 	let subs = await getReddits(req.query.token);
