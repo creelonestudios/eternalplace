@@ -1,15 +1,24 @@
 import fs from "fs"
 import https from "https"
+import http from "http"
 import express from "express";
 import * as sqllib from "mysql-promise"
 import config from "./config-loader.mjs"
 import Canvas from "./canvas.mjs"
+import { Server } from "socket.io";
 
 const canvas = new Canvas(20, 20)
 
 const app = express();
-let httpsServer;
-if(config.usehttps) httpsServer = https.createServer(config.https, app);
+let io;
+let server;
+if(config.usehttps) {
+	server = https.createServer(config.https, app);
+	io = new Server(httpsServer);
+} else {
+	server = http.createServer(app);
+	io = new Server(server);
+}
 
 const sql = sqllib.default()
 sql.configure(config.sql)
@@ -19,13 +28,13 @@ app.use(express.static("htdocs")); // only for static files that dont change
 if(config.usehttps) {
 	// TODO: Add http redirect here
 
-	httpsServer.listen(config.ports.https, () => {
+	server.listen(config.ports.https, () => {
 		console.log("HTTPS Server is running on http://localhost:" + config.ports.https + "/");
 	});
 } else {
 	console.warn("==== WARNING: HTTPS IS NOT ENABLED! ====");
 	console.warn("IT IS HIGHLY RECOMMENDED TO ENABLE HTTPS");
-	app.listen(config.ports.http, () => {
+	server.listen(config.ports.http, () => {
 		console.log("Server is running on http://localhost:" + config.ports.http + "/");
 	});
 }
@@ -83,4 +92,12 @@ app.post("/api/*", (req, res) => {
 		console.log(resdata)
 		res.end(JSON.stringify(resdata))
   })
+})
+
+io.on("connection", (sock) => {
+	console.log("🧦")
+	sock.on("draw", (data) => {
+    console.log("User is drawing", data);
+		io.emit("draw", data);
+  });
 })

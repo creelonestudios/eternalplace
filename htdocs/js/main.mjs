@@ -3,6 +3,7 @@ import { $ } from "./util.mjs"
 
 let width  = 0
 let height = 0
+const sock = io();
 
 const canvas = $("#place")
 
@@ -94,8 +95,19 @@ canvas.addEventListener("click", e => {
 			return
 		}
 	});
+	sock.emit("draw", {x, y, color: selectedColor});
 	requestAnimationFrame(draw)
 })
+
+sock.on("draw", function(data) {
+	let x = data.x
+	let y = data.y
+	let color = data.color
+	let i = y * width + x
+	pixels[i] = color
+	requestAnimationFrame(draw)
+	console.log("someone drew");
+});
 
 canvas.addEventListener("contextmenu", e => {
 	e.preventDefault()
