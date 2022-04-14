@@ -16,6 +16,7 @@ const mouse = {
 
 let pixels = []
 
+if(!getCookie("token")) location.href = "/auth";
 API.place().then(o => {
 	if(o.status.code != "success") {
 		console.log(o.status)
@@ -54,6 +55,12 @@ function draw() {
 	ctx.beginPath()
 	ctx.rect(x-0.5, y-0.5, pixelsize +1, pixelsize +1)
 	ctx.stroke()
+}
+
+function getCookie(name) {
+	let value = "; " + document.cookie;
+	let parts = value.split("; " + name + "=");
+	if (parts.length == 2) return parts.pop().split(";").shift();
 }
 
 const COLORS = ["00ccc0", "e4abff", "009eaa", "5eb3ff", "6a5cff", "004b6f", "de0a7f", "6d001a", "333434", "fff8b8", "313ac1", "00cc4e", "6d302f", "b44ac0", "ff2651", "ffb446", "9c451a", "d4d7d9", "7eed38", "598d5a", "00a344", "245aea", "ff63aa", "ffa800", "511e9f", "33e9f4", "be0027", "ffd623", "1832a4", "ff2d00", "ffffff", "000000"];
@@ -120,7 +127,7 @@ window.addEventListener("mouseup", e => {
 	if(x < 0 || y < 0 || x >= width || y >= height) return
 	let i = y * width + x
 	pixels[i] = selectedColor
-	API.draw(x, y, selectedColor).then(o => {
+	API.draw(x, y, selectedColor, getCookie("token")).then(o => {
 		if(o.status.code != "success") {
 			console.log(o.status)
 			return

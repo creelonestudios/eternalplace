@@ -47,7 +47,7 @@ function loadPixels() {
 }
 
 function createTables() {
-	sql.query("CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(20) NOT NULL, creation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, lastdraw DATETIME)") // users table
+	sql.query("CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(20) NOT NULL UNIQUE, creation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, lastdraw DATETIME, token VARCHAR(100) NOT NULL)") // users table
 	sql.query("CREATE TABLE IF NOT EXISTS history (id INT NOT NULL, x SMALLINT NOT NULL, y SMALLINT NOT NULL, date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, color CHAR(6) NOT NULL DEFAULT \"ffffff\")") // canvas history table
 	sql.query("CREATE TABLE IF NOT EXISTS canvas (x SMALLINT NOT NULL, y SMALLINT NOT NULL, color CHAR(6) NOT NULL DEFAULT \"ffffff\")") // canvas current state table
 }
@@ -86,6 +86,7 @@ app.post("/api/*", (req, res) => {
 				if(current.length == 0) sql.query("INSERT INTO canvas (x, y, color) VALUES (?, ?, ?)", [data.x, data.y, data.color])
 				else sql.query("UPDATE canvas SET color=? WHERE x=? AND y=?", [data.color, data.x, data.y])
 			})
+			sql.query("UPDATE users SET lastdraw=NOW() WHERE token=?", [data.token])
 		} else {
 			resdata.status.code = "unknown_node"
 		}
@@ -102,10 +103,10 @@ function randomState() {
 	return state;
 }
 
-app.get("/auth", (req, res) => { // ! make the random string actually random
+app.get("/auth", (req, res) => {
 	const state = randomState();
 	res.cookie("state", state);
-	res.redirect(`https://www.reddit.com/api/v1/authorize?client_id=${config.reddit.client_id}&response_type=code&state=${state}&redirect_uri=${config.reddit.redirect_uri}&duration=temporary&scope=mysubreddits`);
+	res.redirect(`https://www.reddit.com/api/v1/authorize?client_id=${config.reddit.client_id}&response_type=code&state=${state}&redirect_uri=${config.reddit.redirect_uri}&duration=temporary&scope=mysubreddits%20identity`);
 })
 
 app.get("/reddit", (req, res) => {
@@ -122,12 +123,14 @@ app.get("/reddit", (req, res) => {
 		}
 	})
 	.then(token => token.json())
-	.then(token => {
+	.then(async token => {
 		if(token.token_type !== "bearer") return res.send("Invalid token type");
 		if(!token.access_token) return res.send("No access token");
 		// res.send(res.access_token);
 		res.clearCookie("state");
-		res.redirect("/reddittest?token=" + token.access_token);
+		res.cookie("token", token.access_token);
+		await sql.query("INSERT INTO users (username, creation, token) VALUES (?, NOW(), ?) ON DUPLICATE KEY UPDATE token=?;" , [await getRedditUsername(token.access_token), token.access_token, token.access_token]);
+		res.redirect("/");
 	})
 });
 
@@ -148,6 +151,17 @@ async function getRedditsPaged(token, after) {
 		after: subs.data.after,
 		subs: subs.data.children.map(sub => sub.data.display_name)
 	}
+}
+
+async function getRedditUsername(token) {
+	const user = await fetch("https://oauth.reddit.com/api/v1/me", {
+		headers: {
+			"Authorization": "bearer " + token
+		}
+	})
+	.then(user => user.json())
+
+	return user.name;
 }
 
 async function getReddits(token) {
