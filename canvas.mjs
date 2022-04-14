@@ -8,6 +8,9 @@ export default class Canvas {
 		this.#width  = width
 		this.#height = height
 		this.#canvas = canvaslib.createCanvas(width, height)
+		let ctx = this.#canvas.getContext("2d")
+		ctx.fillStyle = "#ffffff"
+		ctx.fillRect(0, 0, width, height)
 	}
 
 	get width() {
