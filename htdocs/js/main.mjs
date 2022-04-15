@@ -168,7 +168,6 @@ canvas.addEventListener("mouseup", e => {
 		authDialog.show();
 		return;
 	}
-<<<<<<< HEAD
 	API.draw(x, y, selectedColor, getCookie("token")).then(o => {
 		switch(o.status.code) {
 			case "timeout":
@@ -180,14 +179,11 @@ canvas.addEventListener("mouseup", e => {
 			return
 		}
 	});
-=======
 	selectedX = x
 	selectedY = y
 	console.trace("click", x, y);
 	canvas.height = canvas.height - 80
 	$("#picker").style.display = "";
-	requestAnimationFrame(draw)
->>>>>>> 1d1b40c7063eb3ed67c03b7b234fd5b2dc972054
 })
 
 window.m = mouse
