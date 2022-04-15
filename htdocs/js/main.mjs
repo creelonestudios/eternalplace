@@ -162,13 +162,10 @@ window.addEventListener("mouseup", e => {
 		return
 	}
 	let {x, y} = getMousePixel(e.offsetX, e.offsetY, false)
-	if(x < 0 || y < 0 || x >= width || y >= height) return
-	let i = y * width + x
 	if(!authed) {
 		authDialog.show();
 		return;
 	}
-	pixels[i] = selectedColor
 	API.draw(x, y, selectedColor, getCookie("token")).then(o => {
 		if(o.status.code != "success") {
 			console.log(o.status)
