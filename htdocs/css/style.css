@@ -11,6 +11,29 @@ html, body {
 	font-family: "Roboto", sans-serif;
 }
 
+a, a:hover, a:focus, a:visited, a:active {
+	text-decoration: none;
+	color: inherit;
+}
+
+#header {
+	display: flex;
+	flex-direction: row;
+	background-color: #505050;
+	font-size: 25px;
+}
+
+#logo {
+	font-weight: bold;
+	padding: 5px;
+	color: white;
+}
+
+#placeholder {
+	display: flex;
+	flex: 1 0 auto;
+}
+
 #place {
 	margin: 0px;
 	padding: 0px;
@@ -41,30 +64,57 @@ input.color {
 }
 
 #auth {
+	display: flex;
 	/* width: 100px; */
 	padding: 5px;
 	height: 20px;
-	background-color: #ccc;
-	position: fixed;
 	right: 15px;
+	cursor: pointer;
+	color: white;
+	font-size: 20px;
+	padding-right: 10px;
 }
 
 #authdialog {
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	background-color: #ccc;
+	background-color: #808080;
 	border-radius: 15px;
 	padding: 20px;
 	display: flex;
 	align-items: center;
 	flex-direction: column;
 	gap: 5px;
+	opacity: 1;
+	color: white;
+}
+
+#darken #authdialog {
+	animation-name: popIn;
+	animation-duration: 0.25s;
 }
 
 #authdialog * {
 	margin: 0;
+}
+
+#authdialog a {
+	color: #00b0f4;
+	font-weight: bold;
+}
+
+#authdialog-hide {
+	background-color: #585858;
+	border-style: none;
+	border-width: 0px;
+	padding: 5px;
+	margin: 5px;
+	border-radius: 5px;
+	color: white;
+	margin-top: 20px;
+	padding: 5px;
+}
+
+#authdialog-hide:hover {
+	background-color: #505050;
 }
 
 #darken,
@@ -75,6 +125,10 @@ input.color {
 	width: 100%;
 	height: 100%;
 	background-color: #000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1
 }
 
 #darken {
@@ -87,28 +141,27 @@ input.color {
 
 @keyframes darkenIn {
 	from {
-		opacity: 0;
+		background-color: rgba(0, 0, 0, 0)
 	}
 	to {
-		opacity: 0.7;
+		background-color: rgba(0, 0, 0, 0.7)
 	}
 }
 
 @keyframes darkenOut {
 	from {
-		opacity: 0.7;
+		background-color: rgba(0, 0, 0, 0.7)
 	}
 	to {
-		opacity: 0;
+		background-color: rgba(0, 0, 0, 0)
 	}
 }
 
-button {
-	border-style: none;
-	border-width: 0px;
-	background-color: rgb(48, 48, 48);
-	padding: 5px;
-	margin: 5px;
-	border-radius: 5px;
-	color: white;
+@keyframes popIn {
+	from {
+		transform: scale(0);
+	}
+	to {
+		transform: scale(1);
+	}
 }
