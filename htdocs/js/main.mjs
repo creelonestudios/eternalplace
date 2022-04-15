@@ -180,16 +180,18 @@ canvas.addEventListener("mouseup", e => {
 		authDialog.show();
 		return;
 	}
-	if(Date.now() - lastaction > 5*60*1000) {
-		selectedX = x
-		selectedY = y
-		//console.trace("click", x, y);
-		canvas.height = canvas.height - 80
-		$("#picker").style.display = "";
-		requestAnimationFrame(draw);
-	} else {
-		countdown.className = "rage"
-		setTimeout(() => countdown.className = "", 400)
+	if(x >= 0 && y >= 0 && x < width && y < height) {
+		if(Date.now() - lastaction > 5*60*1000) {
+			selectedX = x
+			selectedY = y
+			//console.trace("click", x, y);
+			canvas.height = canvas.height - 80
+			$("#picker").style.display = "";
+			requestAnimationFrame(draw);
+		} else {
+			countdown.className = "rage"
+			setTimeout(() => countdown.className = "", 400)
+		}
 	}
 })
 
