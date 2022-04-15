@@ -8,6 +8,11 @@ import Canvas from "./canvas.mjs"
 import { Server } from "socket.io";
 import fetch from "node-fetch"
 import cookieParser from "cookie-parser";
+import path from "path"
+import { fileURLToPath } from "url"
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const canvas = new Canvas(20, 20)
 
@@ -202,6 +207,10 @@ app.get("/redditsubs", async (req, res) => {
 
 	let subs = await getReddits(req.query.token);
 	res.send(subs);
+})
+
+app.get("*", (req, res) => {
+	res.sendFile(__dirname + "/404.html");
 })
 
 io.on("connection", (sock) => {
