@@ -136,17 +136,17 @@ canvas.addEventListener("mousewheel", async e => {
 
 	console.log(zoom, before);
 	if(zoom < 0.5) {
-		if($("#picker")) {
-			$("#picker").id = "picker-hide";
-			await new Promise(resolve => setTimeout(resolve, 500));
-			$("#picker-hide").style.display = "none"
-		}
+		// if($("#picker")) {
+			// $("#picker").id = "picker-hide";
+			// await new Promise(resolve => setTimeout(resolve, 500));
+			$("#picker").style.display = "none"
+		// }
 	} else {
-		if($("#picker-hide")) {
-			$("#picker-hide").style.display = ""
+		// if($("#picker-hide")) {
+			$("#picker").style.display = ""
 			canvas.height = 1
-			$("#picker-hide").id = "picker";
-		}
+			// $("#picker-hide").id = "picker";
+		// }
 	}
 
 	if(zoom != before) requestAnimationFrame(draw)
