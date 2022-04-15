@@ -52,7 +52,7 @@ function loadPixels() {
 }
 
 function createTables() {
-	sql.query("CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(20) NOT NULL UNIQUE, creation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, lastdraw DATETIME, token VARCHAR(100) NOT NULL)") // users table
+	sql.query("CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(20) NOT NULL UNIQUE, creation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, lastaction DATETIME, token VARCHAR(100) NOT NULL)") // users table
 	sql.query("CREATE TABLE IF NOT EXISTS history (id INT NOT NULL, x SMALLINT NOT NULL, y SMALLINT NOT NULL, date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, color CHAR(6) NOT NULL DEFAULT \"ffffff\")") // canvas history table
 	sql.query("CREATE TABLE IF NOT EXISTS canvas (x SMALLINT NOT NULL, y SMALLINT NOT NULL, color CHAR(6) NOT NULL DEFAULT \"ffffff\")") // canvas current state table
 }
@@ -96,14 +96,22 @@ app.post("/api/*", (req, res) => {
 				resdata.status.message = "Invalid token"
 				return;
 			}
-			canvas.setPixel(data.x, data.y, data.color)
-			sql.query("INSERT INTO history (id, x, y, date, color) VALUES (0, ?, ?, NOW(), ?)", [data.x, data.y, data.color])
-			sql.query("SELECT color FROM canvas WHERE x=? AND y=?", [data.x, data.y]).spread((current) => {
-				if(current.length == 0) sql.query("INSERT INTO canvas (x, y, color) VALUES (?, ?, ?)", [data.x, data.y, data.color])
-				else sql.query("UPDATE canvas SET color=? WHERE x=? AND y=?", [data.color, data.x, data.y])
-			})
-			sql.query("UPDATE users SET lastdraw=NOW() WHERE token=?", [data.token])
-			io.emit("draw", data);
+			let t = user[0].lastaction.getTime()
+			console.log(Date.now(), t, Date.now() -t)
+			if(Date.now() - t < 5*60*1000) { // 5 minutes
+				resdata.status.code = "timeout"
+				resdata.status.message = "You have to wait 5 minutes."
+				resdata.data = {lastaction: user[0].lastaction}
+			} else {
+				canvas.setPixel(data.x, data.y, data.color)
+				sql.query("INSERT INTO history (id, x, y, date, color) VALUES (0, ?, ?, NOW(), ?)", [data.x, data.y, data.color])
+				sql.query("SELECT color FROM canvas WHERE x=? AND y=?", [data.x, data.y]).spread((current) => {
+					if(current.length == 0) sql.query("INSERT INTO canvas (x, y, color) VALUES (?, ?, ?)", [data.x, data.y, data.color])
+					else sql.query("UPDATE canvas SET color=? WHERE x=? AND y=?", [data.color, data.x, data.y])
+				})
+				sql.query("UPDATE users SET lastaction=NOW() WHERE token=?", [data.token])
+				io.emit("draw", data);
+			}
 		} else {
 			resdata.status.code = "unknown_node"
 		}
