@@ -10,7 +10,7 @@ let offsetY = 0
 const sock  = io();
 let authed  = false;
 
-let authDialog = new Dialog("#authdialog").hideButton("#authdialog-hide").hide();
+let authDialog = new Dialog("#authdialog").hideButton("#authdialog-hide").disappear();
 
 const canvas = $("#place")
 
@@ -126,7 +126,6 @@ window.addEventListener("mouseup", e => {
 		return
 	}
 	let {x, y} = getMousePixel(e.offsetX, e.offsetY, false)
-	console.log(x, y)
 	if(x < 0 || y < 0 || x >= width || y >= height) return
 	let i = y * width + x
 	if(!authed) {

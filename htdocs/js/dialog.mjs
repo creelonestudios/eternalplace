@@ -14,8 +14,17 @@ export default class Dialog {
     return this;
   }
 
-  hide() {
+  disappear() {
     this.el.style.display = "none";
+    $("#darken").style.display = "none";
+    return this;
+  }
+
+  async hide() {
+    this.el.style.display = "none";
+    $("#darken").id = "darkenOut";
+    await new Promise(resolve => setTimeout(resolve, 500));
+    $("#darkenOut").id = "darken";
     $("#darken").style.display = "none";
     return this;
   }
