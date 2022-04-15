@@ -66,23 +66,23 @@ a, a:hover, a:focus, a:visited, a:active {
 	flex: 1 0 auto;
 }
 
-#picker,
-#picker-hide {
+#picker {
 	bottom: 0px;
 	height: 80px;
 	width: 100%;
 	background-color: #404040;
 	display: flex;
 	position: fixed;
+	transform: translateY(100%);
 }
 
-#picker {
+.showpicker {
 	animation-name: slideInFromBottom;
 	animation-duration: 0.25s;
 	animation-fill-mode: forwards;
 }
 
-#picker-hide {
+.hidepicker {
 	animation-name: slideOutFromBottom;
 	animation-duration: 0.25s;
 	animation-fill-mode: forwards;

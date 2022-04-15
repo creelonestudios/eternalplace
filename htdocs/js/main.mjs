@@ -126,7 +126,7 @@ function populateColorPicker() {
 				selectedX = null;
 				selectedY = null;
 			}
-			$("#picker").style.display = "none"
+			$("#picker").className = "hidepicker"
 			requestAnimationFrame(draw)
 		})
 		picker.appendChild(div)
@@ -186,7 +186,7 @@ canvas.addEventListener("mouseup", e => {
 			selectedY = y
 			//console.trace("click", x, y);
 			canvas.height = canvas.height - 80
-			$("#picker").style.display = "";
+			$("#picker").className = "showpicker"
 			requestAnimationFrame(draw);
 		} else {
 			countdown.className = "rage"
