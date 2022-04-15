@@ -10,6 +10,8 @@ let offsetY = 0
 const sock  = io();
 let authed  = false;
 let lastaction = 0
+let selectedX = null;
+let selectedY = null;
 
 let authDialog = new Dialog("#authdialog").hideButton("#authdialog-hide").disappear();
 
@@ -91,7 +93,7 @@ function getCookie(name) {
 }
 
 const COLORS = ["00ccc0", "e4abff", "009eaa", "5eb3ff", "6a5cff", "004b6f", "de0a7f", "6d001a", "333434", "fff8b8", "313ac1", "00cc4e", "6d302f", "b44ac0", "ff2651", "ffb446", "9c451a", "d4d7d9", "7eed38", "598d5a", "00a344", "245aea", "ff63aa", "ffa800", "511e9f", "33e9f4", "be0027", "ffd623", "1832a4", "ff2d00", "ffffff", "000000"];
-let selectedColor = "000000"
+let selectedColor = "ff0000"
 
 populateColorPicker();
 
@@ -103,7 +105,19 @@ function populateColorPicker() {
 		div.className = "color"
 		div.style.backgroundColor = "#" + color
 		div.addEventListener("click", () => {
-			selectedColor = color
+			if(selectedX != null && selectedY != null) {
+				console.log(selectedX, selectedY, color)
+				API.draw(selectedX, selectedY, color, getCookie("token")).then(o => {
+					if(o.status.code != "success") {
+						console.log(o.status)
+						return
+					}
+				});
+				selectedX = null;
+				selectedY = null;
+			}
+			$("#picker").style.display = "none"
+			requestAnimationFrame(draw)
 		})
 		picker.appendChild(div)
 	}
@@ -137,28 +151,13 @@ canvas.addEventListener("mousewheel", async e => {
 	else if(e.deltaY < 0 && zoom < 4) zoom *= 2
 	else return
 
-	console.log(zoom, before);
-	if(zoom < 0.5) {
-		// if($("#picker")) {
-			// $("#picker").id = "picker-hide";
-			// await new Promise(resolve => setTimeout(resolve, 500));
-			$("#picker").style.display = "none"
-		// }
-	} else {
-		// if($("#picker-hide")) {
-			$("#picker").style.display = ""
-			canvas.height = 1
-			// $("#picker-hide").id = "picker";
-		// }
-	}
-
 	if(zoom != before) requestAnimationFrame(draw)
 }, { passive: true})
-window.addEventListener("mousedown", e => {
+canvas.addEventListener("mousedown", e => {
 	mouse.pressed = true
 	mouse.pressTime = Date.now()
 })
-window.addEventListener("mouseup", e => {
+canvas.addEventListener("mouseup", e => {
 	mouse.pressed = false
 	if(mouse.drag || zoom < 0.5) {
 		mouse.drag = false
@@ -169,6 +168,7 @@ window.addEventListener("mouseup", e => {
 		authDialog.show();
 		return;
 	}
+<<<<<<< HEAD
 	API.draw(x, y, selectedColor, getCookie("token")).then(o => {
 		switch(o.status.code) {
 			case "timeout":
@@ -180,6 +180,14 @@ window.addEventListener("mouseup", e => {
 			return
 		}
 	});
+=======
+	selectedX = x
+	selectedY = y
+	console.trace("click", x, y);
+	canvas.height = canvas.height - 80
+	$("#picker").style.display = "";
+	requestAnimationFrame(draw)
+>>>>>>> 1d1b40c7063eb3ed67c03b7b234fd5b2dc972054
 })
 
 window.m = mouse
