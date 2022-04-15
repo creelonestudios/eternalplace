@@ -101,7 +101,7 @@ app.post("/api/*", (req, res) => {
 				return;
 			}
 			let t = user[0].lastaction.getTime()
-			console.log(Date.now(), t, Date.now() -t)
+			//console.log(Date.now(), t, Date.now() -t)
 			if(Date.now() - t < 5*60*1000) { // 5 minutes
 				resdata.status.code = "timeout"
 				resdata.status.message = "You have to wait 5 minutes."

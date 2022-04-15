@@ -178,12 +178,17 @@ canvas.addEventListener("mouseup", e => {
 		authDialog.show();
 		return;
 	}
-	selectedX = x
-	selectedY = y
-	console.trace("click", x, y);
-	canvas.height = canvas.height - 80
-	$("#picker").style.display = "";
-	requestAnimationFrame(draw);
+	if(Date.now() - lastaction > 5*60*1000) {
+		selectedX = x
+		selectedY = y
+		//console.trace("click", x, y);
+		canvas.height = canvas.height - 80
+		$("#picker").style.display = "";
+		requestAnimationFrame(draw);
+	} else {
+		countdown.className = "rage"
+		setTimeout(() => countdown.className = "", 400)
+	}
 })
 
 window.m = mouse
@@ -240,15 +245,16 @@ canvas.addEventListener("contextmenu", e => {
 
 function updateCountdown() {
 	let diff = (Date.now() - lastaction)/1000
-	console.log(diff)
-	if(diff > 5*60) return
+	if(diff > 5*60) {
+		countdown.innerText = `You may draw now.`
+		return
+	}
 	let secs = Math.floor(5*60 - diff)
 	let mins = 0
 	while(secs >= 60) {
 		mins++
 		secs -= 60
 	}
-	console.log(mins, secs)
 	if(mins > 0) countdown.innerText = `${mins}min and ${secs}s left`
 	else countdown.innerText = `${secs}s left`
 }
