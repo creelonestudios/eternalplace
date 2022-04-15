@@ -106,8 +106,12 @@ function populateColorPicker() {
 		div.style.backgroundColor = "#" + color
 		div.addEventListener("click", () => {
 			if(selectedX != null && selectedY != null) {
-				console.log(selectedX, selectedY, color)
 				API.draw(selectedX, selectedY, color, getCookie("token")).then(o => {
+					switch(o.status.code) {
+						case "timeout":
+						case "success":
+						lastaction = o.data.lastaction
+					}
 					if(o.status.code != "success") {
 						console.log(o.status)
 						return
@@ -168,22 +172,12 @@ canvas.addEventListener("mouseup", e => {
 		authDialog.show();
 		return;
 	}
-	API.draw(x, y, selectedColor, getCookie("token")).then(o => {
-		switch(o.status.code) {
-			case "timeout":
-			case "success":
-			lastaction = o.data.lastaction
-		}
-		if(o.status.code != "success") {
-			console.log(o.status)
-			return
-		}
-	});
 	selectedX = x
 	selectedY = y
 	console.trace("click", x, y);
 	canvas.height = canvas.height - 80
 	$("#picker").style.display = "";
+	requestAnimationFrame(draw);
 })
 
 window.m = mouse
