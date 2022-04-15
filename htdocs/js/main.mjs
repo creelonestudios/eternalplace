@@ -128,11 +128,27 @@ canvas.addEventListener("mousemove", e => {
 	mouse.y = e.offsetY
 	if(zoom >= 0.5 || mouse.drag) requestAnimationFrame(draw)
 })
-canvas.addEventListener("mousewheel", e => {
+canvas.addEventListener("mousewheel", async e => {
 	let before = zoom
 	if(e.deltaY > 0 && zoom > Math.max(20 / Math.min(width, height), 0.1)) zoom *= 0.5
 	else if(e.deltaY < 0 && zoom < 4) zoom *= 2
 	else return
+
+	console.log(zoom, before);
+	if(zoom < 0.5) {
+		if($("#picker")) {
+			$("#picker").id = "picker-hide";
+			await new Promise(resolve => setTimeout(resolve, 500));
+			$("#picker-hide").style.display = "none"
+		}
+	} else {
+		if($("#picker-hide")) {
+			$("#picker-hide").style.display = ""
+			canvas.height = 1
+			$("#picker-hide").id = "picker";
+		}
+	}
+
 	if(zoom != before) requestAnimationFrame(draw)
 }, { passive: true})
 window.addEventListener("mousedown", e => {

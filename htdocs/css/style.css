@@ -42,12 +42,43 @@ a, a:hover, a:focus, a:visited, a:active {
 	flex: 1 0 auto;
 }
 
-#picker {
+#picker,
+#picker-hide {
 	bottom: 0px;
 	height: 80px;
 	width: 100%;
-	background-color: #ccc;
+	background-color: #404040;
 	display: flex;
+}
+
+#picker {
+	animation-name: slideInFromBottom;
+	animation-duration: 0.25s;
+	animation-fill-mode: forwards;
+}
+
+#picker-hide {
+	animation-name: slideOutFromBottom;
+	animation-duration: 0.25s;
+	animation-fill-mode: forwards;
+}
+
+@keyframes slideInFromBottom {
+	from {
+		transform: translateY(100%);
+	}
+	to {
+		transform: translateY(0%);
+	}
+}
+
+@keyframes slideOutFromBottom {
+	from {
+		transform: translateY(0%);
+	}
+	to {
+		transform: translateY(100%);
+	}
 }
 
 .color {
