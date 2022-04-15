@@ -9,10 +9,12 @@ let offsetX = 0
 let offsetY = 0
 const sock  = io();
 let authed  = false;
+let lastaction = 0
 
 let authDialog = new Dialog("#authdialog").hideButton("#authdialog-hide").disappear();
 
 const canvas = $("#place")
+const countdown = $("#countdown-text")
 
 const mouse = {
 	x: 0, y: 0, pressed: false, drag: false, pressTime: -1
@@ -20,7 +22,7 @@ const mouse = {
 
 let pixels = []
 
-API.place().then(o => {
+API.place(getCookie("token")).then(o => {
 	if(o.status.code != "success") {
 		console.log(o.status)
 		return
@@ -31,6 +33,7 @@ API.place().then(o => {
 	pixels  = o.data.pixels
 	offsetX = o.data.width /2
 	offsetY = o.data.height/2
+	if(o.data.lastaction) lastaction = o.data.lastaction
 
 	requestAnimationFrame(draw)
 })
@@ -167,6 +170,11 @@ window.addEventListener("mouseup", e => {
 		return;
 	}
 	API.draw(x, y, selectedColor, getCookie("token")).then(o => {
+		switch(o.status.code) {
+			case "timeout":
+			case "success":
+			lastaction = o.data.lastaction
+		}
 		if(o.status.code != "success") {
 			console.log(o.status)
 			return
@@ -225,3 +233,20 @@ if(getCookie("token")) {
 canvas.addEventListener("contextmenu", e => {
 	e.preventDefault()
 })
+
+function updateCountdown() {
+	let diff = (Date.now() - lastaction)/1000
+	console.log(diff)
+	if(diff > 5*60) return
+	let secs = Math.floor(5*60 - diff)
+	let mins = 0
+	while(secs >= 60) {
+		mins++
+		secs -= 60
+	}
+	console.log(mins, secs)
+	if(mins > 0) countdown.innerText = `${mins}min and ${secs}s left`
+	else countdown.innerText = `${secs}s left`
+}
+
+setInterval(updateCountdown, 1000)

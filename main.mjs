@@ -80,9 +80,13 @@ app.post("/api/*", (req, res) => {
 			resdata.data = {}
 			resdata.data.width = canvas.width
 			resdata.data.height = canvas.height
-			console.log("hi")
 			resdata.data.pixels = canvas.pixelArray()
-			console.log(resdata.data.pixels)
+			if(data.token) {
+				const user = await spread(sql.query("SELECT * FROM users WHERE token = ?", [data.token]))
+				if(user.length > 0) {
+					resdata.data.lastaction = user[0].lastaction.getTime()
+				}
+			}
 		} else if(req.url == "/api/draw") {
 			resdata.status.code = "success"
 			if(!data.token) {
@@ -101,7 +105,7 @@ app.post("/api/*", (req, res) => {
 			if(Date.now() - t < 5*60*1000) { // 5 minutes
 				resdata.status.code = "timeout"
 				resdata.status.message = "You have to wait 5 minutes."
-				resdata.data = {lastaction: user[0].lastaction}
+				resdata.data = {lastaction: t}
 			} else {
 				canvas.setPixel(data.x, data.y, data.color)
 				sql.query("INSERT INTO history (id, x, y, date, color) VALUES (0, ?, ?, NOW(), ?)", [data.x, data.y, data.color])
@@ -111,6 +115,7 @@ app.post("/api/*", (req, res) => {
 				})
 				sql.query("UPDATE users SET lastaction=NOW() WHERE token=?", [data.token])
 				io.emit("draw", data);
+				resdata.data = {lastaction: Date.now()}
 			}
 		} else {
 			resdata.status.code = "unknown_node"

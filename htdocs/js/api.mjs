@@ -9,11 +9,11 @@ export default class API {
     .catch(console.error)
   }
 
-	static place() {
-		console.log("place", {})
+	static place(token) {
+		console.log("place", {token})
     return fetch("/api/place", {
       method: "POST",
-      body: JSON.stringify({})
+      body: JSON.stringify({token})
     }).then(res => res.json())
     .catch(console.error)
 	}
