@@ -14,7 +14,7 @@ import { fileURLToPath } from "url"
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const canvas = new Canvas(200, 200)
+const canvas = new Canvas(20, 20)
 
 const app = express();
 let io;
