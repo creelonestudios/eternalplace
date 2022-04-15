@@ -49,6 +49,15 @@ a, a:hover, a:focus, a:visited, a:active {
 	flex: 1 0 auto;
 }
 
+#coordinates {
+	display: flex;
+	color: white;
+	font-size: 18px;
+	padding-right: 15px;
+	font-family: monospace;
+	transform: translateY(1px);
+}
+
 #place {
 	margin: 0px;
 	padding: 0px;

@@ -153,6 +153,8 @@ canvas.addEventListener("mousemove", e => {
 	}
 	mouse.x = e.offsetX
 	mouse.y = e.offsetY
+	let {x, y} = getMousePixel(null, null, false)
+	$("#coordinates").innerText = `${x};${y}`
 	if(zoom >= 0.5 || mouse.drag) requestAnimationFrame(draw)
 })
 canvas.addEventListener("mousewheel", async e => {
