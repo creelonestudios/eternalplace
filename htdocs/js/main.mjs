@@ -35,7 +35,12 @@ API.place().then(o => {
 	requestAnimationFrame(draw)
 })
 
+// for benchmarking
+//let drawingTime = 0
+//let frames      = 0
+
 function draw() {
+	//let time = Date.now()
 	// console.log("draw!", width, height)
 	canvas.width = canvas.clientWidth
 	canvas.height = canvas.clientHeight
@@ -46,18 +51,34 @@ function draw() {
 	ctx.fillStyle = "#404040"
 	ctx.fillRect(0, 0, canvas.width, canvas.height)
 	ctx.translate(offX, offY) // offset/zoom and centering
-	for(let x = 0; x < width; x++) {
-		for(let y = 0; y < height; y++) {
+	let fromX = Math.max(Math.floor((width*pixelsize  - ((offsetX)*pixelsize) - canvas.width /2) / pixelsize), 0)
+	let fromY = Math.max(Math.floor((height*pixelsize - ((offsetY)*pixelsize) - canvas.height/2) / pixelsize), 0)
+	let toX   = Math.ceil((width*pixelsize  - ((offsetX)*pixelsize) + canvas.width /2) / pixelsize)
+	let toY   = Math.ceil((height*pixelsize - ((offsetY)*pixelsize) + canvas.height/2) / pixelsize)
+	//console.log(fromX, toX, fromY, toY)
+	//return
+	if(toX < fromX || toY < fromY || toX == Infinity || toY == Infinity) return
+	/*let fromX = 0
+	let fromY = 0
+	let toX = width
+	let toY = height // */
+	for(let x = fromX; x < toX && x < width; x++) {
+		for(let y = fromY; y < toY && y < height; y++) {
 			let i = y * width + x
 			ctx.fillStyle = "#" + pixels[i]
 			ctx.fillRect(x * pixelsize, y * pixelsize, pixelsize, pixelsize)
 		}
 	}
-	let {x, y} = getMousePixel()
-	ctx.strokeStyle = `#808080`
-	ctx.beginPath()
-	ctx.rect(x-0.5, y-0.5, pixelsize +1, pixelsize +1)
-	ctx.stroke()
+	if(zoom >= 0.5) {
+		let {x, y} = getMousePixel()
+		ctx.strokeStyle = `#808080`
+		ctx.beginPath()
+		ctx.rect(x-0.5, y-0.5, pixelsize +1, pixelsize +1)
+		ctx.stroke()
+	}
+	//drawingTime += Date.now() - time
+	//frames++
+	//console.log("draw avg:", drawingTime / frames)
 }
 
 function getCookie(name) {
@@ -105,14 +126,14 @@ canvas.addEventListener("mousemove", e => {
 	}
 	mouse.x = e.offsetX
 	mouse.y = e.offsetY
-	requestAnimationFrame(draw)
+	if(zoom >= 0.5 || mouse.drag) requestAnimationFrame(draw)
 })
 canvas.addEventListener("mousewheel", e => {
+	let before = zoom
 	if(e.deltaY > 0 && zoom > Math.max(20 / Math.min(width, height), 0.1)) zoom *= 0.5
 	else if(e.deltaY < 0 && zoom < 4) zoom *= 2
 	else return
-	console.log(zoom)
-	requestAnimationFrame(draw)
+	if(zoom != before) requestAnimationFrame(draw)
 }, { passive: true})
 window.addEventListener("mousedown", e => {
 	mouse.pressed = true
@@ -120,8 +141,7 @@ window.addEventListener("mousedown", e => {
 })
 window.addEventListener("mouseup", e => {
 	mouse.pressed = false
-	console.log(mouse.drag)
-	if(mouse.drag) {
+	if(mouse.drag || zoom < 0.5) {
 		mouse.drag = false
 		return
 	}
@@ -140,7 +160,6 @@ window.addEventListener("mouseup", e => {
 		}
 	});
 	sock.emit("draw", {x, y, color: selectedColor});
-	requestAnimationFrame(draw)
 })
 
 window.m = mouse
@@ -163,7 +182,9 @@ sock.on("draw", function(data) {
 	let color = data.color
 	let i = y * width + x
 	pixels[i] = color
-	requestAnimationFrame(draw)
+	let ctx = canvas.getContext("2d")
+	ctx.fillStyle = "#" + pixels[i]
+	ctx.fillRect(x * 40*zoom, y * 40*zoom, 40*zoom, 40*zoom)
 	console.log("someone drew");
 });
 
