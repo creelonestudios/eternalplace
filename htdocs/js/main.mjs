@@ -175,7 +175,6 @@ window.addEventListener("mouseup", e => {
 			return
 		}
 	});
-	sock.emit("draw", {x, y, color: selectedColor});
 })
 
 window.m = mouse

@@ -103,6 +103,7 @@ app.post("/api/*", (req, res) => {
 				else sql.query("UPDATE canvas SET color=? WHERE x=? AND y=?", [data.color, data.x, data.y])
 			})
 			sql.query("UPDATE users SET lastdraw=NOW() WHERE token=?", [data.token])
+			io.emit("draw", data);
 		} else {
 			resdata.status.code = "unknown_node"
 		}
@@ -236,9 +237,4 @@ io.on("connection", (sock) => {
 			username: await getRedditUsername(token)
 		});
 	});
-	sock.on("draw", (data) => {
-		if(!authed) return;
-    console.log("User is drawing", data);
-		io.emit("draw", data);
-  });
 })
