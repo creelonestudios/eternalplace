@@ -1,5 +1,6 @@
 import API from "./api.mjs"
 import { $ } from "./util.mjs"
+import Dialog from "./dialog.mjs";
 
 let width   = 0
 let height  = 0
@@ -7,6 +8,9 @@ let zoom    = 1
 let offsetX = 0
 let offsetY = 0
 const sock  = io();
+let authed  = false;
+
+let authDialog = new Dialog("#authdialog").hideButton("#authdialog-hide").hide();
 
 const canvas = $("#place")
 
@@ -16,7 +20,6 @@ const mouse = {
 
 let pixels = []
 
-if(!getCookie("token")) location.href = "/auth";
 API.place().then(o => {
 	if(o.status.code != "success") {
 		console.log(o.status)
@@ -126,6 +129,10 @@ window.addEventListener("mouseup", e => {
 	console.log(x, y)
 	if(x < 0 || y < 0 || x >= width || y >= height) return
 	let i = y * width + x
+	if(!authed) {
+		authDialog.show();
+		return;
+	}
 	pixels[i] = selectedColor
 	API.draw(x, y, selectedColor, getCookie("token")).then(o => {
 		if(o.status.code != "success") {
@@ -160,6 +167,28 @@ sock.on("draw", function(data) {
 	requestAnimationFrame(draw)
 	console.log("someone drew");
 });
+
+sock.on("auth", (data) => {
+	if(data.status.code == "invalid_token") {
+		// not logged in
+		console.log("not logged in");
+		$("#auth").innerHTML = "<a href='/auth'>Log in using Reddit</a>"
+	} else if(data.status.code == "success") {
+		// logged in, may draw now
+		console.log("logged in")
+		$("#auth").innerText = "Logged in as " + data.username
+		authed = true;
+	} else {
+		// unknown error
+		console.log("unknown error")
+		$("#auth").innerHTML = "<a href='/auth'>Relog using Reddit</a>"
+	}
+})
+
+if(getCookie("token")) {
+	$("#auth").innerText = "Authenticating..."
+	sock.emit("auth", getCookie("token"));
+}
 
 canvas.addEventListener("contextmenu", e => {
 	e.preventDefault()

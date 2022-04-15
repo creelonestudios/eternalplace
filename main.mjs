@@ -80,6 +80,17 @@ app.post("/api/*", (req, res) => {
 			console.log(resdata.data.pixels)
 		} else if(req.url == "/api/draw") {
 			resdata.status.code = "success"
+			if(!data.token) {
+				resdata.status.code = "invalid_token"
+				resdata.status.message = "No token provided"
+				return;
+			}
+			const user = await spread(sql.query("SELECT * FROM users WHERE token = ?", [data.token]));
+			if(user.length == 0) {
+				resdata.status.code = "invalid_token"
+				resdata.status.message = "Invalid token"
+				return;
+			}
 			canvas.setPixel(data.x, data.y, data.color)
 			sql.query("INSERT INTO history (id, x, y, date, color) VALUES (0, ?, ?, NOW(), ?)", [data.x, data.y, data.color])
 			sql.query("SELECT color FROM canvas WHERE x=? AND y=?", [data.x, data.y]).spread((current) => {
@@ -94,6 +105,14 @@ app.post("/api/*", (req, res) => {
 		res.end(JSON.stringify(resdata))
   })
 })
+
+async function spread(p) {
+	return new Promise((resolve, reject) => {
+		p.spread(data => {
+			resolve(data)
+		});
+	});
+}
 
 function randomState() {
 	let state = "";
@@ -187,7 +206,29 @@ app.get("/redditsubs", async (req, res) => {
 
 io.on("connection", (sock) => {
 	console.log("🧦")
+	let authed = false;
+	sock.on("auth", async (token) => {
+		const user = await spread(sql.query("SELECT * FROM users WHERE token = ?", [token]));
+		if(user.length == 0) {
+			sock.emit("auth", {
+				status: {
+					code: "invalid_token",
+					message: "Invalid token"
+				}
+			});
+			return;
+		}
+		authed = true;
+		sock.emit("auth", {
+			status: {
+				code: "success",
+				message: "Success"
+			},
+			username: await getRedditUsername(token)
+		});
+	});
 	sock.on("draw", (data) => {
+		if(!authed) return;
     console.log("User is drawing", data);
 		io.emit("draw", data);
   });
