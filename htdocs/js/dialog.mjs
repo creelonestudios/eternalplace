@@ -21,11 +21,10 @@ export default class Dialog {
   }
 
   async hide() {
-    this.el.style.display = "none";
     $("#darken").id = "darkenOut";
     await new Promise(resolve => setTimeout(resolve, 500));
+    $("#darkenOut").style.display = "none";
     $("#darkenOut").id = "darken";
-    $("#darken").style.display = "none";
     return this;
   }
 

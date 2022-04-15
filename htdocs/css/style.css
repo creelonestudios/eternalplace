@@ -90,6 +90,13 @@ input.color {
 #darken #authdialog {
 	animation-name: popIn;
 	animation-duration: 0.25s;
+	animation-fill-mode: forwards;
+}
+
+#darkenOut #authdialog {
+	animation-name: popOut;
+	animation-duration: 0.25s;
+	animation-fill-mode: forwards;
 }
 
 #authdialog * {
@@ -163,5 +170,14 @@ input.color {
 	}
 	to {
 		transform: scale(1);
+	}
+}
+
+@keyframes popOut {
+	from {
+		transform: scale(1);
+	}
+	to {
+		transform: scale(0);
 	}
 }
