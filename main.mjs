@@ -88,6 +88,19 @@ app.post("/api/*", (req, res) => {
 					resdata.data.lastaction = user[0].lastaction.getTime()
 				}
 			}
+		} else if(req.url == "/api/zones") {
+			resdata.status.code = "success"
+			resdata.data = {}
+			const zones = await spread(sql.query("SELECT * FROM zones"))
+			// make it into a nice json, the key is name
+			resdata.data.zones = {}
+			zones.forEach(zone => {
+				resdata.data.zones[zone.name] = {
+					id: zone.id,
+					creation: zone.creation,
+					position: JSON.parse(zone.position),
+				};
+			});
 		} else if(req.url == "/api/draw") {
 			resdata.status.code = "success"
 			if(!data.token) {
