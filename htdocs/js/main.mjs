@@ -10,8 +10,8 @@ let offsetY = 0
 const sock  = io();
 let authed  = false;
 let lastaction = 0
-let selectedX = null;
-let selectedY = null;
+let selectedX = location.hash.split(";").length == 2 ? location.hash.slice(1).split(";")[0] : null;
+let selectedY = location.hash.split(";").length == 2 ? location.hash.split(";")[1] : null;
 
 let authDialog = new Dialog("#authdialog").hideButton("#authdialog-hide").disappear();
 
