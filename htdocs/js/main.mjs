@@ -132,6 +132,11 @@ function populateColorPicker() {
 						case "timeout":
 						case "success":
 						lastaction = o.data.lastaction
+						break;
+					}
+					if(o.status.code == "invalid_zone") {
+						$("#zonedialog-name").innerText = o.status.zone;
+						zoneDialog.show();
 					}
 					if(o.status.code != "success") {
 						console.log(o.status)
