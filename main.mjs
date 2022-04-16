@@ -14,7 +14,7 @@ import { fileURLToPath } from "url"
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const canvas = new Canvas(200, 200)
+const canvas = new Canvas(20, 20)
 
 const app = express();
 let io;
@@ -61,6 +61,20 @@ function createTables() {
 createTables();
 loadPixels();
 
+async function getZones() {
+	const ret = {};
+	const zones = await spread(sql.query("SELECT * FROM zones"))
+	zones.forEach(zone => {
+		ret[zone.name] = {
+			id: zone.id,
+			name: zone.name,
+			creation: zone.creation,
+			position: JSON.parse(zone.position),
+		};
+	});
+	return ret;
+}
+
 app.post("/api/*", (req, res) => {
 	console.log(`[${req.ip}] API Request: ${req.url}`)
 	let data = []
@@ -91,16 +105,7 @@ app.post("/api/*", (req, res) => {
 		} else if(req.url == "/api/zones") {
 			resdata.status.code = "success"
 			resdata.data = {}
-			const zones = await spread(sql.query("SELECT * FROM zones"))
-			// make it into a nice json, the key is name
-			resdata.data.zones = {}
-			zones.forEach(zone => {
-				resdata.data.zones[zone.name] = {
-					id: zone.id,
-					creation: zone.creation,
-					position: JSON.parse(zone.position),
-				};
-			});
+			resdata.data.zones = await getZones();
 		} else if(req.url == "/api/draw") {
 			resdata.status.code = "success"
 			if(!data.token) {
@@ -121,6 +126,27 @@ app.post("/api/*", (req, res) => {
 				resdata.status.message = "You have to wait 5 minutes."
 				resdata.data = {lastaction: t}
 			} else {
+
+				const zones = await getZones();
+				let zone = null;
+				for(let i in zones) {
+					for(let j in zones[i].position) {
+						if(zones[i].position[j].x == data.x && zones[i].position[j].y == data.y) {
+							zone = zones[i];
+							break;
+						}
+					}
+				}
+				if(zone) {
+					const subs = await getReddits(data.token);
+					if(!subs.includes(zone.name)) {
+						resdata.status.code = "invalid_zone"
+						resdata.status.message = "You are not allowed to draw in this zone."
+						resdata.status.zone = zone.name
+						return;
+					}
+				}
+
 				canvas.setPixel(data.x, data.y, data.color)
 				sql.query("INSERT INTO history (id, x, y, date, color) VALUES (0, ?, ?, NOW(), ?)", [data.x, data.y, data.color])
 				sql.query("SELECT color FROM canvas WHERE x=? AND y=?", [data.x, data.y]).spread((current) => {
@@ -131,6 +157,9 @@ app.post("/api/*", (req, res) => {
 				io.emit("draw", data);
 				resdata.data = {lastaction: Date.now()}
 			}
+		} else if(req.url == "/api/reddits") {
+			resdata.status.code = "success"
+			resdata.data = await getReddits(data.token);
 		} else {
 			resdata.status.code = "unknown_node"
 		}

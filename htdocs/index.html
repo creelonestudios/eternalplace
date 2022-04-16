@@ -17,11 +17,16 @@
 </head>
 
 <body>
-	<div id=darken>
-		<div id="authdialog">
+	<div id=darken style="display: none;">
+		<div id="authdialog" style="display: none;" class="dialog">
 	    <h1>Hold on!</h1>
 	    <p>Before you can draw you need to <a href="/auth">log in</a> using Reddit.</p>
 	    <button id="authdialog-hide">Not now</button>
+	  </div>
+		<div id="zonedialog" style="display: none;" class="dialog">
+	    <h1>Hold up!</h1>
+	    <p>This pixel is owned by r/<span id="zonedialog-name"></span></p>
+	    <button id="zonedialog-hide">Oh ok</button>
 	  </div>
 	</div>
 	<div id=header>

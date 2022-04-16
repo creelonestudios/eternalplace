@@ -12,8 +12,11 @@ let authed  = false;
 let lastaction = 0
 let selectedX = location.hash.split(";").length == 2 ? location.hash.slice(1).split(";")[0] : null;
 let selectedY = location.hash.split(";").length == 2 ? location.hash.split(";")[1] : null;
+let zones = (await API.zones()).data.zones;
+let subs = (await API.reddits(getCookie("token"))).data;
 
-let authDialog = new Dialog("#authdialog").hideButton("#authdialog-hide").disappear();
+let authDialog = new Dialog("#authdialog").hideButton("#authdialog-hide");
+let zoneDialog = new Dialog("#zonedialog").hideButton("#zonedialog-hide");
 
 const canvas = $("#place")
 const countdown = $("#countdown-text")
@@ -169,7 +172,7 @@ canvas.addEventListener("mousedown", e => {
 	mouse.pressed = true
 	mouse.pressTime = Date.now()
 })
-canvas.addEventListener("mouseup", e => {
+canvas.addEventListener("mouseup", async e => {
 	mouse.pressed = false
 	if(mouse.drag || zoom < 0.5) {
 		mouse.drag = false
@@ -182,6 +185,23 @@ canvas.addEventListener("mouseup", e => {
 	}
 	if(x >= 0 && y >= 0 && x < width && y < height) {
 		if(Date.now() - lastaction > 5*60*1000) {
+			let zone = null;
+			for(let i in zones) {
+				for(let j in zones[i].position) {
+					if(zones[i].position[j].x == x && zones[i].position[j].y == y) {
+						zone = zones[i];
+						break;
+					}
+				}
+			}
+			console.log(zones);
+			if(zone) {
+				if(!subs.includes(zone.name)) {
+					$("#zonedialog-name").innerText = zone.name;
+					zoneDialog.show();
+					return;
+				}
+			}
 			selectedX = x
 			selectedY = y
 			//console.trace("click", x, y);
@@ -219,6 +239,10 @@ sock.on("draw", function(data) {
 	ctx.fillStyle = "#" + pixels[i]
 	ctx.fillRect(x * 40*zoom, y * 40*zoom, 40*zoom, 40*zoom)
 	console.log("someone drew");
+});
+
+sock.on("zone_update", async () => {
+	zones = (await API.zones()).data.zones;
 });
 
 sock.on("auth", (data) => {

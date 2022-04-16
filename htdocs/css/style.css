@@ -127,7 +127,7 @@ input.color {
 	padding-right: 10px;
 }
 
-#authdialog {
+.dialog {
 	background-color: #808080;
 	border-radius: 15px;
 	padding: 20px;
@@ -139,23 +139,23 @@ input.color {
 	color: white;
 }
 
-#darken #authdialog {
+#darken .dialog {
 	animation-name: popIn;
 	animation-duration: 0.25s;
 	animation-fill-mode: forwards;
 }
 
-#darkenOut #authdialog {
+#darkenOut .dialog {
 	animation-name: popOut;
 	animation-duration: 0.25s;
 	animation-fill-mode: forwards;
 }
 
-#authdialog * {
+.dialog * {
 	margin: 0;
 }
 
-#authdialog a {
+.dialog a {
 	color: #00b0f4;
 	font-weight: bold;
 }
@@ -173,6 +173,22 @@ input.color {
 }
 
 #authdialog-hide:hover {
+	background-color: #505050;
+}
+
+#zonedialog-hide {
+	background-color: #585858;
+	border-style: none;
+	border-width: 0px;
+	padding: 5px;
+	margin: 5px;
+	border-radius: 5px;
+	color: white;
+	margin-top: 20px;
+	padding: 5px;
+}
+
+#zonedialog-hide:hover {
 	background-color: #505050;
 }
 

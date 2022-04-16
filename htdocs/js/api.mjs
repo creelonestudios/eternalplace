@@ -26,4 +26,19 @@ export default class API {
     .catch(console.error);
   }
 
+  static zones() {
+    return fetch("/api/zones", {
+      method: "POST"
+    }).then(res => res.json())
+    .catch(console.error);
+  }
+
+  static reddits(token) {
+    return fetch("/api/reddits", {
+      method: "POST",
+      body: JSON.stringify({token})
+    }).then(res => res.json())
+    .catch(console.error);
+  }
+
 }
