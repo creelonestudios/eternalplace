@@ -12,8 +12,20 @@ let authed  = false;
 let lastaction = 0
 let selectedX = location.hash.split(";").length == 2 ? location.hash.slice(1).split(";")[0] : null;
 let selectedY = location.hash.split(";").length == 2 ? location.hash.split(";")[1] : null;
-let zones = (await API.zones()).data.zones;
-let subs = (await API.reddits(getCookie("token"))).data;
+let zones;
+let subs;
+
+function finishedLoading() {
+	return zones != null && subs != null;
+}
+
+API.zones().then(o => {
+	zones = o.data.zones;
+});
+
+API.reddits(getCookie("token")).then(o => {
+	subs = o.data;
+})
 
 let authDialog = new Dialog("#authdialog").hideButton("#authdialog-hide");
 let zoneDialog = new Dialog("#zonedialog").hideButton("#zonedialog-hide");
@@ -183,6 +195,7 @@ canvas.addEventListener("mouseup", async e => {
 		authDialog.show();
 		return;
 	}
+	if(!finishedLoading()) return;
 	if(x >= 0 && y >= 0 && x < width && y < height) {
 		if(Date.now() - lastaction > 5*60*1000) {
 			let zone = null;
