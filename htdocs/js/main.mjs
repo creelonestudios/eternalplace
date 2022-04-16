@@ -81,7 +81,7 @@ function draw() {
 		ctx.rect(x-0.5, y-0.5, pixelsize +1, pixelsize +1)
 		ctx.stroke()
 	}
-	if(selectedX && selectedY) {
+	if(selectedX != null && selectedY != null) {
 		ctx.strokeStyle = `#60b060`
 		ctx.beginPath()
 		ctx.rect((selectedX*pixelsize)-0.5, (selectedY*pixelsize)-0.5, pixelsize +1, pixelsize +1)
