@@ -52,7 +52,7 @@ function loadPixels() {
 }
 
 function createTables() {
-	sql.query("CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(20) NOT NULL UNIQUE, creation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, lastaction DATETIME, token VARCHAR(100) NOT NULL)") // users table
+	sql.query("CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(20) NOT NULL UNIQUE, creation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, lastaction DATETIME NOT NULL, token VARCHAR(100) NOT NULL)") // users table
 	sql.query("CREATE TABLE IF NOT EXISTS history (id INT NOT NULL, x SMALLINT NOT NULL, y SMALLINT NOT NULL, date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, color CHAR(6) NOT NULL DEFAULT \"ffffff\")") // canvas history table
 	sql.query("CREATE TABLE IF NOT EXISTS canvas (x SMALLINT NOT NULL, y SMALLINT NOT NULL, color CHAR(6) NOT NULL DEFAULT \"ffffff\")") // canvas current state table
 }
