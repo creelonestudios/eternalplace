@@ -167,7 +167,7 @@ app.get("/reddit", (req, res) => {
 		// res.send(res.access_token);
 		res.clearCookie("state");
 		res.cookie("token", token.access_token);
-		await sql.query("INSERT INTO users (username, creation, token) VALUES (?, NOW(), ?) ON DUPLICATE KEY UPDATE token=?;" , [await getRedditUsername(token.access_token), token.access_token, token.access_token]);
+		await sql.query("INSERT INTO users (username, creation, lastaction, token) VALUES (?, NOW(), ?, ?) ON DUPLICATE KEY UPDATE token=?;" , [await getRedditUsername(token.access_token), new Date(0), token.access_token, token.access_token]);
 		res.redirect("/");
 	})
 });
