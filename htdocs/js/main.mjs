@@ -191,6 +191,7 @@ canvas.addEventListener("mouseup", e => {
 		} else {
 			countdown.className = "rage"
 			setTimeout(() => countdown.className = "", 400)
+			new Audio("sound/timeout.mp3").play()
 		}
 	}
 })

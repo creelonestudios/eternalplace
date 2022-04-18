@@ -192,14 +192,18 @@ async function getRedditsPaged(token, after) {
 }
 
 async function getRedditUsername(token) {
-	const user = await fetch("https://oauth.reddit.com/api/v1/me", {
-		headers: {
-			"Authorization": "bearer " + token
-		}
-	})
-	.then(user => user.json())
-
-	return user.name;
+	try {
+		const user = await fetch("https://oauth.reddit.com/api/v1/me", {
+			headers: {
+				"Authorization": "bearer " + token
+			}
+		})
+		.then(user => user.json())
+	
+		return user.name;
+	} catch(e) {
+		return null;
+	}
 }
 
 async function getReddits(token) {
@@ -241,13 +245,23 @@ io.on("connection", (sock) => {
 			});
 			return;
 		}
+		const username = await getRedditUsername(token);
+		if(username == null) {
+			sock.emit("auth", {
+				status: {
+					code: "invalid_token",
+					message: "Invalid token"
+				}
+			});
+			return;
+		}
 		authed = true;
 		sock.emit("auth", {
 			status: {
 				code: "success",
 				message: "Success"
 			},
-			username: await getRedditUsername(token)
+			username
 		});
 	});
 })
