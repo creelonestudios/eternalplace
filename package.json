@@ -18,8 +18,8 @@
   },
   "homepage": "https://github.com/creelonestudios/eternalplace#readme",
   "dependencies": {
-    "cookie-parser": "^1.4.6",
     "canvas": "^2.9.1",
+    "cookie-parser": "^1.4.6",
     "express": "^4.17.3",
     "mysql-promise": "^5.0.0",
     "node-fetch": "^3.2.3",

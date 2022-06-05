@@ -55,8 +55,24 @@ export default class Canvas {
 		return arr
 	}
 
-	image() {
+	image(scale) {
+		if(!isNaN(scale) && scale != 1 && scale >= 0.5 && scale <= 8) {
+			return scaleCanvas(this.#canvas, scale, this.#pixels).toBuffer()
+		}
 		return this.#canvas.toBuffer()
 	}
 
+}
+
+function scaleCanvas(source, scale, pixels) {
+	let cnv = canvaslib.createCanvas(source.width * scale, source.height * scale)
+	let ctx = cnv.getContext("2d")
+	for(let x = 0; x < source.width; x++) {
+		for(let y = 0; y < source.height; y++) {
+			if(!pixels.has(`${x};${y}`)) continue
+			ctx.fillStyle = "#" + pixels.get(`${x};${y}`)
+			ctx.fillRect(x * scale, y * scale, scale, scale)
+		}
+	}
+	return cnv
 }

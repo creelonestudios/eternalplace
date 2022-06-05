@@ -107,6 +107,7 @@ app.post("/api/*", (req, res) => {
 				resdata.status.message = "You have to wait 5 minutes."
 				resdata.data = {lastaction: t}
 			} else {
+<<<<<<< Updated upstream
 				canvas.setPixel(data.x, data.y, data.color)
 				sql.query("INSERT INTO history (id, x, y, date, color) VALUES (0, ?, ?, NOW(), ?)", [data.x, data.y, data.color])
 				sql.query("SELECT color FROM canvas WHERE x=? AND y=?", [data.x, data.y]).spread((current) => {
@@ -116,6 +117,48 @@ app.post("/api/*", (req, res) => {
 				sql.query("UPDATE users SET lastaction=NOW() WHERE token=?", [data.token])
 				io.emit("draw", data);
 				resdata.data = {lastaction: Date.now()}
+=======
+				let t = user[0].lastaction.getTime()
+				//console.log(Date.now(), t, Date.now() -t)
+				if(Date.now() - t < 5*60*1000) { // 5 minutes
+					resdata.status.code = "timeout"
+					resdata.status.message = "You have to wait 5 minutes."
+					resdata.data = {lastaction: t}
+				} else {
+					const zones = await getZones();
+					let zone = null;
+					for(let i in zones) {
+						for(let j in zones[i].position) {
+							if(zones[i].position[j].x == data.x && zones[i].position[j].y == data.y) {
+								zone = zones[i];
+								break;
+							}
+						}
+					}
+					let allowed = true;
+					if(zone) {
+						const subs = await getReddits(data.token);
+						if(!subs.includes(zone.name)) {
+							resdata.status.code = "invalid_zone"
+							resdata.status.message = "You are not allowed to draw in this zone."
+							resdata.status.zone = zone.name
+							allowed = false;
+						}
+					}
+
+					if(allowed) {
+						canvas.setPixel(data.x, data.y, data.color)
+						sql.query("INSERT INTO history (id, x, y, date, color) VALUES (0, ?, ?, NOW(), ?)", [data.x, data.y, data.color])
+						sql.query("SELECT color FROM canvas WHERE x=? AND y=?", [data.x, data.y]).spread((current) => {
+							if(current.length == 0) sql.query("INSERT INTO canvas (x, y, color) VALUES (?, ?, ?)", [data.x, data.y, data.color])
+							else sql.query("UPDATE canvas SET color=? WHERE x=? AND y=?", [data.color, data.x, data.y])
+						})
+						sql.query("UPDATE users SET lastaction=NOW() WHERE token=?", [data.token])
+						io.emit("draw", data);
+						resdata.data = {lastaction: Date.now()}
+					}
+				}
+>>>>>>> Stashed changes
 			}
 		} else {
 			resdata.status.code = "unknown_node"
@@ -174,7 +217,7 @@ app.get("/reddit", (req, res) => {
 
 app.get("/place.png", (req, res) => {
 	res.setHeader("Content-Type", "image/png")
-	res.end(canvas.image())
+	res.end(canvas.image(req.query.scale || 1))
 })
 
 async function getRedditsPaged(token, after) {
@@ -199,7 +242,7 @@ async function getRedditUsername(token) {
 			}
 		})
 		.then(user => user.json())
-	
+
 		return user.name;
 	} catch(e) {
 		return null;
