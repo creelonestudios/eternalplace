@@ -107,17 +107,6 @@ app.post("/api/*", (req, res) => {
 				resdata.status.message = "You have to wait 5 minutes."
 				resdata.data = {lastaction: t}
 			} else {
-<<<<<<< Updated upstream
-				canvas.setPixel(data.x, data.y, data.color)
-				sql.query("INSERT INTO history (id, x, y, date, color) VALUES (0, ?, ?, NOW(), ?)", [data.x, data.y, data.color])
-				sql.query("SELECT color FROM canvas WHERE x=? AND y=?", [data.x, data.y]).spread((current) => {
-					if(current.length == 0) sql.query("INSERT INTO canvas (x, y, color) VALUES (?, ?, ?)", [data.x, data.y, data.color])
-					else sql.query("UPDATE canvas SET color=? WHERE x=? AND y=?", [data.color, data.x, data.y])
-				})
-				sql.query("UPDATE users SET lastaction=NOW() WHERE token=?", [data.token])
-				io.emit("draw", data);
-				resdata.data = {lastaction: Date.now()}
-=======
 				let t = user[0].lastaction.getTime()
 				//console.log(Date.now(), t, Date.now() -t)
 				if(Date.now() - t < 5*60*1000) { // 5 minutes
@@ -125,7 +114,7 @@ app.post("/api/*", (req, res) => {
 					resdata.status.message = "You have to wait 5 minutes."
 					resdata.data = {lastaction: t}
 				} else {
-					const zones = await getZones();
+					/*const zones = await getZones();
 					let zone = null;
 					for(let i in zones) {
 						for(let j in zones[i].position) {
@@ -134,9 +123,9 @@ app.post("/api/*", (req, res) => {
 								break;
 							}
 						}
-					}
+					}*/
 					let allowed = true;
-					if(zone) {
+					/*if(zone) {
 						const subs = await getReddits(data.token);
 						if(!subs.includes(zone.name)) {
 							resdata.status.code = "invalid_zone"
@@ -144,7 +133,7 @@ app.post("/api/*", (req, res) => {
 							resdata.status.zone = zone.name
 							allowed = false;
 						}
-					}
+					}*/
 
 					if(allowed) {
 						canvas.setPixel(data.x, data.y, data.color)
@@ -158,7 +147,6 @@ app.post("/api/*", (req, res) => {
 						resdata.data = {lastaction: Date.now()}
 					}
 				}
->>>>>>> Stashed changes
 			}
 		} else {
 			resdata.status.code = "unknown_node"
